@@ -1,0 +1,12 @@
+{
+  "name": "Worldo",
+  "displayName": "Worldo",
+  "expo": {
+    "name": "Worldo",
+    "slug": "Worldo",
+    "version": "1.0.0",
+    "assetBundlePatterns": [
+      "**/*"
+    ]
+  }
+}
