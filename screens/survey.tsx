@@ -34,9 +34,9 @@ export default function Survey({ navigation, route }: IProps) {
               <Card key={index}>
                 <Text style={styles.questionTitle}>{question.question}</Text>
                 <View style={styles.questionOptions}>
-                  {question.options.map((opt) => {
+                  {question.options.map((opt, optIndex) => {
                     return (
-                      <View style={styles.questionOption}>
+                      <View key={optIndex} style={styles.questionOption}>
                         <Text style={styles.questionOptionText}>{opt}</Text>
                       </View>
                     );
