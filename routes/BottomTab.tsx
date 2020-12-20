@@ -32,7 +32,7 @@ export default function () {
         options={{
           tabBarLabel: "Spørgeskemaer",
           tabBarIcon: "clipboard-text",
-          tabBarBadge: "12",
+          tabBarBadge: "4",
           tabBarColor: "#1371cf",
         }}
         component={SurveyStack}

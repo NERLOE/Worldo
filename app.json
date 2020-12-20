@@ -3,10 +3,21 @@
   "displayName": "Worldo",
   "expo": {
     "name": "Worldo",
+    "icon": "./assets/logo.jpg",
     "slug": "Worldo",
     "version": "1.0.0",
+    "orientation": "portrait",
+    "ios": {
+      "bundleIdentifier": "dk.marcusnerloe.worldo",
+      "buildNumber": "1.0.0"
+    },
+    "android": {
+      "package": "dk.marcusnerloe.worldo",
+      "versionCode": 1
+    },
     "assetBundlePatterns": [
       "**/*"
-    ]
+    ],
+    "description": "Worldo er en dansk app lavet af gymnasieelever på Københavns Mediegymnasium."
   }
 }

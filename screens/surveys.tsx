@@ -1,12 +1,12 @@
 import * as React from "react";
-import { StyleSheet, Text, View, Button } from "react-native";
+import { StyleSheet, Text, View } from "react-native";
 import { FlatList, TouchableOpacity } from "react-native-gesture-handler";
-import { StackNavigationProp, StackScreenProps } from "@react-navigation/stack";
+import { StackNavigationProp } from "@react-navigation/stack";
 import { ParamListBase, RouteProp } from "@react-navigation/native";
 import { globalStyles } from "../styles/global";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Card from "../shared/card";
-import LinearGradient from "react-native-linear-gradient";
+import SurveyData from "../data/SurveyData";
 
 interface IProps {
   navigation: StackNavigationProp<ParamListBase, keyof ParamListBase>;
@@ -25,104 +25,59 @@ export interface ISurvey {
   price: number;
   questions: Array<SurveyQuestion>;
   author: string;
+  answered?: boolean;
   key: string;
 }
 
+const wait = (timeout: number) => {
+  return new Promise((resolve) => {
+    setTimeout(resolve, timeout);
+  });
+};
+
 export default function Surveys({ navigation, route }: IProps) {
-  const [surveys, setSurveys] = React.useState<Array<ISurvey>>([
-    {
-      name: "Sortering af affald",
-      title: "Håndtering af sortering af affald",
-      description:
-        "Vi lever i året 2020 og klimaforandring er en stor del af vores hverdag. Skraldesortering har en stor indflydelse på udledelsen af CO2 i verden, så derfor vil vi gerne stille nogle hurtige spørgsmål omkring dig og din affaldssortering.",
-      price: 500,
-      questions: [
-        {
-          question: "Hvor tit sortere du dit affald?",
-          options: ["Hver dag", "Aldrig"],
-        },
-        {
-          question: "Hvilke sorteringsmuligheder har du?",
-          options: ["Alt sorteres hvert for sig", "Intet bliver sorteret"],
-        },
-        {
-          question: "Hvor tit sortere du dit affald?",
-          options: ["Hver dag", "Aldrig"],
-        },
-        {
-          question: "Hvilke sorteringsmuligheder har du?",
-          options: ["Alt sorteres hvert for sig", "Intet bliver sorteret"],
-        },
-      ],
-      author: "Ørsted",
-      key: "1",
-    },
-    {
-      name: "Plastikforbrug",
-      title: "Plastikforbrug",
-      description:
-        "Vi lever i året 2020 og klimaforandring er en stor del af vores hverdag. Skraldesortering har en stor indflydelse på udledelsen af CO2 i verden, så derfor vil vi gerne stille nogle hurtige spørgsmål omkring dig og din affaldssortering.",
-      price: 500,
-      questions: [
-        {
-          question: "Hvor tit sortere du dit affald?",
-          options: ["Hver dag", "Aldrig"],
-        },
-      ],
-      author: "Salling Group",
-      key: "2",
-    },
-    {
-      name: "Rejser",
-      title: "Spørgeskema omkring rejseforbrug",
-      description:
-        "Vi lever i året 2020 og klimaforandring er en stor del af vores hverdag. Skraldesortering har en stor indflydelse på udledelsen af CO2 i verden, så derfor vil vi gerne stille nogle hurtige spørgsmål omkring dig og din affaldssortering.",
-      price: 500,
-      questions: [
-        {
-          question: "Hvor tit sortere du dit affald?",
-          options: ["Hver dag", "Aldrig"],
-        },
-      ],
-      author: "SAS",
-      key: "3",
-    },
-    {
-      name: "Sortering af affald",
-      title: "Sortering af affald",
-      description:
-        "Vi lever i året 2020 og klimaforandring er en stor del af vores hverdag. Skraldesortering har en stor indflydelse på udledelsen af CO2 i verden, så derfor vil vi gerne stille nogle hurtige spørgsmål omkring dig og din affaldssortering.",
-      price: 500,
-      questions: [
-        {
-          question: "Hvor tit sortere du dit affald?",
-          options: ["Hver dag", "Aldrig"],
-        },
-      ],
-      author: "Ørsted",
-      key: "4",
-    },
-  ]);
+  const [refreshing, setRefreshing] = React.useState(false);
+  const [surveys, setSurveys] = React.useState<Array<ISurvey>>(SurveyData);
+
+  const onRefresh = React.useCallback(() => {
+    setRefreshing(true);
+
+    wait(2000).then(() => setRefreshing(false));
+  }, []);
 
   return (
     <SafeAreaView style={globalStyles.container}>
       <FlatList
-        data={surveys}
+        data={surveys.sort((s) => (s.answered ? 1 : -1))}
         renderItem={({ item, index }) => {
-          var calcTime = item.questions.length;
           var amtOptions = 0;
           item.questions.forEach((q) => {
             amtOptions += q.options.length;
           });
 
-          calcTime = Math.floor(amtOptions / item.questions.length);
+          var calcTime =
+            item.questions.length * 0.1 +
+            (amtOptions / item.questions.length) * 0.05; // Math.floor(amtOptions / item.questions.length);
+
+          var time = "";
+          if (calcTime < 1) {
+            time = 60 * calcTime + " sek.";
+          } else {
+            time = calcTime + " min.";
+          }
 
           return (
             <TouchableOpacity
               key={index}
               onPress={() => navigation.navigate("Survey", item)}
             >
-              <Card>
+              <Card
+                style={
+                  item.answered
+                    ? styles.answeredSurveyContainer
+                    : styles.unAnsweredSurveyContainer
+                }
+              >
                 <View style={styles.surveyContainer}>
                   <Text style={styles.surveyTitle}>{item.name}</Text>
                   <Text style={styles.surveyPrice}>{item.price} point</Text>
@@ -130,9 +85,7 @@ export default function Surveys({ navigation, route }: IProps) {
                   <Text style={styles.surveyDesc} numberOfLines={2}>
                     {item.description}
                   </Text>
-                  <Text style={styles.surveyTime}>
-                    Tager ca. {calcTime} min.
-                  </Text>
+                  <Text style={styles.surveyTime}>Tager ca. {time}</Text>
                 </View>
               </Card>
             </TouchableOpacity>
@@ -144,6 +97,12 @@ export default function Surveys({ navigation, route }: IProps) {
 }
 
 const styles = StyleSheet.create({
+  answeredSurveyContainer: {
+    backgroundColor: "rgba(100, 255, 100, 0.4)",
+  },
+  unAnsweredSurveyContainer: {
+    backgroundColor: "rgba(255, 50, 50, 1)",
+  },
   surveyContainer: {
     display: "flex",
     flexDirection: "column",

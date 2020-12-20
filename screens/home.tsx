@@ -1,5 +1,5 @@
 import * as React from "react";
-import { StyleSheet, Text, Button } from "react-native";
+import { StyleSheet, Text, Button, ImageBackground } from "react-native";
 import { StackNavigationProp, StackScreenProps } from "@react-navigation/stack";
 import { ParamListBase, RouteProp } from "@react-navigation/native";
 import { globalStyles } from "../styles/global";
@@ -11,14 +11,18 @@ interface IProps {
 }
 
 export default function Home({ navigation, route }: IProps) {
-  const pressHandler = () => {
-    navigation.navigate("Surveys");
-  };
-
   return (
     <SafeAreaView style={globalStyles.container}>
-      <Text style={globalStyles.titleText}>Dette er forsiden</Text>
-      <Button onPress={pressHandler} title="Gå til spørgeskemaer" />
+      <ImageBackground
+        source={require("../assets/worldoFront.png")}
+        style={styles.backgroundImage}
+      ></ImageBackground>
     </SafeAreaView>
   );
 }
+
+const styles = StyleSheet.create({
+  backgroundImage: {
+    flex: 1,
+  },
+});
